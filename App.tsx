@@ -7,10 +7,12 @@ import About from './pages/About';
 import Services from './pages/Services';
 import Contact from './pages/Contact';
 import ChatWidget from './components/ChatWidget';
+import ScrollToTop from './components/ScrollToTop';
 
 const App: React.FC = () => {
   return (
     <HashRouter>
+      <ScrollToTop />
       <div className="flex flex-col min-h-screen bg-gray-50 text-slate-800 relative">
         <Navbar />
         <main className="flex-grow pt-16">
