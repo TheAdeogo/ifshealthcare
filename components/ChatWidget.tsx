@@ -2,33 +2,34 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
 import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 
-const SYSTEM_INSTRUCTION = `You are a helpful AI support assistant for IFS Healthcare Limited.
-Use the following company information to answer user queries:
+const SYSTEM_INSTRUCTION = `You are the professional AI support assistant for IFS Healthcare Limited.
+Your tone is strategic, helpful, and focused on clinical excellence.
 
-About Us: IFS Healthcare Limited is a health sector focused organization providing specialized services to private and public sectors.
-Mission: To enable sustainable profitable enterprise performance through the whole life management of physical assets and productive workplace and provision of effective business support services.
-Vision: To become the largest facilities management, project management and business support organisation in Nigeria, Africa and the Middle East.
-Core Values: Service, Expertise, Entrepreneurship, Timelessness.
+Current Focus (Refinement Phase):
+We provide a stronger articulation of our Healthcare Facilities Management (FM) services designed to support safe, compliant, and uninterrupted clinical operations.
 
-Services:
-1. Healthcare Facilities Management: Reducing losses, saving time/effort, efficient facility usage.
-2. Healthcare Resourcing: Providing accurate health data, analytics, data-driven solutions using AI/ML.
-3. Healthcare Financing: Raising funds, reducing financial barriers, efficient fund allocation.
-4. Diaspora Skills Repatriation: Specialist services in Renal, Cardiac, and Orthopaedics using robotics. Group Practice model.
+Healthcare FM Framework (The 6 Pillars):
+1. Hard FM & Engineering: Maintenance of critical assets, MEP, medical gas, HVAC, and power to support clinical uptime.
+2. Soft FM Services: Infection-control cleaning, clinical waste management, portering, and laundry coordination.
+3. Asset & Lifecycle Management: Equipment uptime, lifecycle planning, and cost optimisation.
+4. Compliance, HSE & Risk Management: Regulatory compliance, safety audits, and continuous improvement.
+5. Patient & Staff Experience Support: Front-of-house support, helpdesk operations, and environment enhancement.
+6. Digital & Performance Management: Use of CMMS, reporting dashboards, and KPIs to drive transparency.
 
-Team:
-Dr. Tunde Ayeye (Group MD)
-Bukola Makinde (Lead Consultant)
-Mary Ikechukwu (Marketing Comms)
-Prof. Yemi Laosebikan (Clinical Innovations)
-Dr. Dale Ogunbayo (Medical & Allied Service)
+Strategic Approach:
+We act as a strategic FM partner, integrating people, processes, and technology to deliver reliable, cost-effective solutions.
+
+Other Core Offerings:
+- Healthcare Resourcing: Using AI/ML for health data analytics.
+- Healthcare Financing: Sustainable financing for Universal Health Coverage in Africa.
+- Diaspora Skills Repatriation: Group Practice Model for Renal, Cardiac, and Orthopaedics.
 
 Contact:
-Address: 5a Eunice Tutorial Close, Gbagada Phase II, Gbagada, Lagos.
+Location: 5a Eunice Tutorial Close, Gbagada Phase II, Lagos.
 Phone: +234-812 820 8855
 Email: info@ifshealthcare.com
 
-Be polite, professional, and concise. Your brand colors are Blue and Dark Red.`;
+Keep responses professional and concise. Prioritize clinical uptime and safety in FM-related queries.`;
 
 interface Message {
   role: 'user' | 'model';
@@ -38,7 +39,7 @@ interface Message {
 const ChatWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: 'Hello! How can I help you with IFS Healthcare services today?' }
+    { role: 'model', text: 'Hello! I am your IFS Assistant. How can I help you with our refined healthcare FM framework or specialist services today?' }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -54,25 +55,18 @@ const ChatWidget: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const initializeChat = () => {
+  const getChatSession = () => {
     if (!chatSessionRef.current) {
-        try {
-            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-            chatSessionRef.current = ai.chats.create({
-                model: 'gemini-3-pro-preview',
-                config: {
-                    systemInstruction: SYSTEM_INSTRUCTION,
-                },
-            });
-        } catch (error) {
-            console.error("Failed to initialize chat", error);
-        }
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+      chatSessionRef.current = ai.chats.create({
+        model: 'gemini-3-pro-preview',
+        config: {
+          systemInstruction: SYSTEM_INSTRUCTION,
+        },
+      });
     }
+    return chatSessionRef.current;
   };
-
-  useEffect(() => {
-      initializeChat();
-  }, []);
 
   const handleSend = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -83,32 +77,33 @@ const ChatWidget: React.FC = () => {
     setIsLoading(true);
 
     try {
-      if (!chatSessionRef.current) initializeChat();
+      const chat = getChatSession();
+      const result = await chat.sendMessageStream({ message: userMessage });
       
-      if (chatSessionRef.current) {
-          const result = await chatSessionRef.current.sendMessageStream({ message: userMessage });
-          
-          let fullResponse = "";
-          setMessages(prev => [...prev, { role: 'model', text: "" }]);
+      let fullResponse = "";
+      setMessages(prev => [...prev, { role: 'model', text: "" }]);
 
-          for await (const chunk of result) {
-              const text = (chunk as GenerateContentResponse).text;
-              if (text) {
-                  fullResponse += text;
-                  setMessages(prev => {
-                      const newMessages = [...prev];
-                      const lastMsg = newMessages[newMessages.length - 1];
-                      if (lastMsg.role === 'model') {
-                          lastMsg.text = fullResponse;
-                      }
-                      return newMessages;
-                  });
-              }
-          }
+      for await (const chunk of result) {
+        const text = (chunk as GenerateContentResponse).text;
+        if (text) {
+          fullResponse += text;
+          setMessages(prev => {
+            const newMessages = [...prev];
+            const lastMsg = newMessages[newMessages.length - 1];
+            if (lastMsg.role === 'model') {
+              lastMsg.text = fullResponse;
+            }
+            return newMessages;
+          });
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Chat error:", error);
-      setMessages(prev => [...prev, { role: 'model', text: "I apologize, but I'm having trouble connecting right now. Please try again later." }]);
+      let errorMsg = "I apologize, but I'm having trouble connecting to the system right now.";
+      if (error.message?.includes("API_KEY")) {
+        errorMsg = "Assistant configuration incomplete: API Key is missing.";
+      }
+      setMessages(prev => [...prev, { role: 'model', text: errorMsg }]);
     } finally {
       setIsLoading(false);
     }
@@ -123,38 +118,34 @@ const ChatWidget: React.FC = () => {
 
   return (
     <>
-      {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 ${
           isOpen ? 'bg-ifs-red rotate-90' : 'bg-ifs-blue'
         } text-white`}
-        aria-label="Toggle chat"
+        aria-label="Toggle assistant"
       >
         {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
       </button>
 
-      {/* Chat Window */}
       <div
         className={`fixed bottom-24 right-6 z-50 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl transition-all duration-300 origin-bottom-right flex flex-col overflow-hidden border border-gray-100 ${
           isOpen
             ? 'opacity-100 scale-100 translate-y-0'
             : 'opacity-0 scale-95 translate-y-10 pointer-events-none'
         }`}
-        style={{ maxHeight: 'calc(100vh - 120px)', height: '500px' }}
+        style={{ maxHeight: 'calc(100vh - 120px)', height: '520px' }}
       >
-        {/* Header */}
         <div className="bg-ifs-blue p-4 flex items-center gap-3">
             <div className="bg-ifs-red p-2 rounded-full">
                 <MessageCircle size={20} className="text-white" />
             </div>
             <div>
-                <h3 className="text-white font-bold text-base">IFS Assistant</h3>
-                <p className="text-blue-200 text-xs">How can we help you today?</p>
+                <h3 className="text-white font-bold text-base">IFS Healthcare Assistant</h3>
+                <p className="text-blue-200 text-xs">Strategic Health Support</p>
             </div>
         </div>
 
-        {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
           {messages.map((msg, idx) => (
             <div
@@ -168,22 +159,13 @@ const ChatWidget: React.FC = () => {
                     : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
                 }`}
               >
-                {msg.text}
+                {msg.text || (isLoading && idx === messages.length - 1 ? "..." : "")}
               </div>
             </div>
           ))}
-          {isLoading && messages[messages.length - 1].role === 'user' && (
-             <div className="flex justify-start">
-                <div className="bg-white p-3 rounded-2xl rounded-bl-none border border-gray-200 shadow-sm flex items-center gap-2">
-                    <Loader2 size={16} className="animate-spin text-ifs-red" />
-                    <span className="text-xs text-gray-400">Processing...</span>
-                </div>
-             </div>
-          )}
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Area */}
         <div className="p-4 bg-white border-t border-gray-100">
           <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-full border border-gray-200 focus-within:border-ifs-red focus-within:ring-1 focus-within:ring-ifs-red/20 transition-all">
             <input
@@ -191,7 +173,7 @@ const ChatWidget: React.FC = () => {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Type your message..."
+              placeholder="How can we help?"
               className="flex-1 bg-transparent border-none focus:ring-0 text-sm px-3 text-gray-700 placeholder-gray-400 outline-none"
               disabled={isLoading}
             />
@@ -204,7 +186,7 @@ const ChatWidget: React.FC = () => {
                   : 'text-white bg-ifs-red hover:bg-red-700'
               }`}
             >
-              <Send size={18} />
+              {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
             </button>
           </div>
         </div>
