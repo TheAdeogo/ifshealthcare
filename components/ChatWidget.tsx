@@ -39,7 +39,7 @@ interface Message {
 const ChatWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: 'Hello! I am your IFS Assistant. How can I help you with our refined healthcare FM framework or specialist services today?' }
+    { role: 'model', text: 'Hello! I am your IFS Assistant. How can I help you with our healthcare FM framework or specialist services today?' }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -57,9 +57,13 @@ const ChatWidget: React.FC = () => {
 
   const getChatSession = () => {
     if (!chatSessionRef.current) {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+      const apiKey = process.env.API_KEY;
+      if (!apiKey) {
+        throw new Error("API_KEY_MISSING");
+      }
+      const ai = new GoogleGenAI({ apiKey });
       chatSessionRef.current = ai.chats.create({
-        model: 'gemini-3-pro-preview',
+        model: 'gemini-3-flash-preview',
         config: {
           systemInstruction: SYSTEM_INSTRUCTION,
         },
@@ -99,11 +103,19 @@ const ChatWidget: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Chat error:", error);
-      let errorMsg = "I apologize, but I'm having trouble connecting to the system right now.";
-      if (error.message?.includes("API_KEY")) {
-        errorMsg = "Assistant configuration incomplete: API Key is missing.";
+      let errorMsg = "I apologize, but I'm having trouble connecting. Please try again in a moment.";
+      
+      if (error.message === "API_KEY_MISSING") {
+        errorMsg = "Configuration Error: The API Key is not set in the environment variables.";
+      } else if (error.message?.includes("API key not valid")) {
+        errorMsg = "Authentication Error: The provided API key appears to be invalid.";
+      } else if (error.message?.includes("quota")) {
+        errorMsg = "Service busy: API quota has been reached. Please try again later.";
       }
+      
       setMessages(prev => [...prev, { role: 'model', text: errorMsg }]);
+      // Clear session on error to allow re-initialization
+      chatSessionRef.current = null;
     } finally {
       setIsLoading(false);
     }
