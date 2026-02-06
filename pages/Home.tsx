@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Activity, Users, Banknote, Globe } from 'lucide-react';
+import { ArrowRight, Activity, Users, Banknote, Globe, ShieldCheck } from 'lucide-react';
 
 const Home: React.FC = () => {
   return (
@@ -27,11 +27,11 @@ const Home: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/services" className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-semibold rounded-lg text-ifs-blue bg-white hover:bg-gray-100 transition-all shadow-xl">
-                Our Services
+                Explore Our Services
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
               <Link to="/contact" className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-base font-semibold rounded-lg text-white hover:bg-white/10 transition-all">
-                Contact Us
+                Contact Our Experts
               </Link>
             </div>
           </div>
@@ -77,7 +77,7 @@ const Home: React.FC = () => {
             <h2 className="text-4xl font-extrabold text-gray-900 mb-4">Our Core Pillars</h2>
             <div className="w-20 h-1.5 bg-ifs-red mx-auto mb-6 rounded-full"></div>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-              Delivering excellence through specialized management and financial support.
+              Delivering excellence through our outcome-driven healthcare facilities management and strategic support systems.
             </p>
           </div>
 
@@ -87,9 +87,9 @@ const Home: React.FC = () => {
                 <Activity className="h-7 w-7 text-ifs-red group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Facilities Management</h3>
-              <p className="text-gray-600 text-sm leading-relaxed mb-6">Optimizing physical assets to ensure medical service continuity and operational excellence.</p>
+              <p className="text-gray-600 text-sm leading-relaxed mb-6">Our 6-pillar framework ensures clinical uptime through integrated, safe, and compliant hospital operations.</p>
               <Link to="/services" className="text-ifs-red font-bold text-sm flex items-center group/link">
-                Read more <ArrowRight className="ml-1 h-4 w-4 transform group-hover/link:translate-x-1 transition-transform" />
+                View 6-Pillar Framework <ArrowRight className="ml-1 h-4 w-4 transform group-hover/link:translate-x-1 transition-transform" />
               </Link>
             </div>
 
@@ -98,7 +98,7 @@ const Home: React.FC = () => {
                 <Users className="h-7 w-7 text-ifs-blue group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Healthcare Resourcing</h3>
-              <p className="text-gray-600 text-sm leading-relaxed mb-6">AI-powered analytics and data-driven solutions to optimize talent and clinical outcomes.</p>
+              <p className="text-gray-600 text-sm leading-relaxed mb-6">AI-powered analytics and data-driven solutions to optimize talent and improve clinical outcomes.</p>
               <Link to="/services" className="text-ifs-red font-bold text-sm flex items-center group/link">
                 Read more <ArrowRight className="ml-1 h-4 w-4 transform group-hover/link:translate-x-1 transition-transform" />
               </Link>
@@ -109,7 +109,7 @@ const Home: React.FC = () => {
                 <Banknote className="h-7 w-7 text-amber-600 group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Healthcare Financing</h3>
-              <p className="text-gray-600 text-sm leading-relaxed mb-6">Strategic fund raising and risk pooling to achieve Universal Health Coverage goals.</p>
+              <p className="text-gray-600 text-sm leading-relaxed mb-6">Strategic fund raising and risk pooling to achieve Universal Health Coverage goals in Africa.</p>
               <Link to="/services" className="text-ifs-red font-bold text-sm flex items-center group/link">
                 Read more <ArrowRight className="ml-1 h-4 w-4 transform group-hover/link:translate-x-1 transition-transform" />
               </Link>
@@ -120,7 +120,7 @@ const Home: React.FC = () => {
                 <Globe className="h-7 w-7 text-purple-600 group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Diaspora Skills</h3>
-              <p className="text-gray-600 text-sm leading-relaxed mb-6">Repatriating specialist skills in Renal and Cardiac care via our group practice model.</p>
+              <p className="text-gray-600 text-sm leading-relaxed mb-6">Repatriating specialist skills in Renal and Cardiac care via our sustainable group practice model.</p>
               <Link to="/services" className="text-ifs-red font-bold text-sm flex items-center group/link">
                 Read more <ArrowRight className="ml-1 h-4 w-4 transform group-hover/link:translate-x-1 transition-transform" />
               </Link>
