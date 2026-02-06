@@ -70,9 +70,21 @@ const Contact: React.FC = () => {
               </div>
             </div>
 
-            {/* Placeholder Map */}
-            <div className="mt-8 bg-gray-200 w-full h-64 rounded-xl flex items-center justify-center text-gray-500 border border-gray-300">
-               <span className="flex items-center gap-2"><MapPin size={20}/> Interactive Lagos Map</span>
+            {/* Interactive Map */}
+            <div className="mt-8 w-full h-80 rounded-2xl overflow-hidden shadow-lg border border-gray-200 relative group">
+              <iframe 
+                src="https://maps.google.com/maps?q=5a%20Eunice%20Tutorial%20Close,%20Gbagada%20Phase%20II,%20Lagos&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                width="100%" 
+                height="100%" 
+                style={{ border: 0 }} 
+                allowFullScreen={true} 
+                loading="lazy"
+                title="IFS Healthcare Office Location"
+                className="grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700"
+              ></iframe>
+              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-ifs-blue shadow-sm pointer-events-none uppercase tracking-wider">
+                Gbagada Phase II, Lagos
+              </div>
             </div>
           </div>
 
